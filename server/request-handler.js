@@ -12,6 +12,7 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 var fs = require('fs');
+var url = require('url');
 
 
 var defaultCorsHeaders = {
@@ -45,7 +46,7 @@ var handleGetRequest = function (response) {
 
 var handlePostRequest = function (request, response) {
   // initialize header components
-  var statusCode = 200;
+  var statusCode = 201;
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'application/json';
   // var message = JSON.parse(getRequestBody(request));
@@ -73,7 +74,7 @@ var handlePostRequest = function (request, response) {
         // add objectId to message object
         message.objectId = data.results.length;
         // push message object into data.results array
-        data.results.push(message);
+        data.results.unshift(message);
         // convert data object back into JSON
         data = JSON.stringify(data);
         // write to exampleData.json
@@ -101,7 +102,6 @@ var handlePostRequest = function (request, response) {
 };
 
 var handleOptionsRequest = function(request, response) {
-  // console.log('response:', response);
   var statusCode = 200;
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'application/json';
@@ -134,19 +134,25 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
-    
-  console.log('request method', request.method);
   
-  if (request.method === 'OPTIONS') {
-    handleOptionsRequest(request, response);
-  } else if (request.method === 'GET') {
-    handleGetRequest(response);
-  } else if (request.method === 'POST') {
-    handlePostRequest(request, response);
+  var requestURL = url.parse(request.url);
+  if (requestURL.pathname === '/classes/messages') {
+    if (request.method === 'OPTIONS' ) {
+      handleOptionsRequest(request, response);
+    } else if (request.method === 'GET') {
+      handleGetRequest(response);
+    } else if (request.method === 'POST') {
+      handlePostRequest(request, response);
+    } else {
+      // handleError(response);
+    }
   } else {
-    // handleError(response);
+    var statusCode = 404;
+    var headers = defaultCorsHeaders;
+    headers['Content-Type'] = 'application/json';
+    response.writeHead(statusCode, headers);
+    response.end();
   }
-  
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
