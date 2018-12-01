@@ -21,8 +21,31 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
+// var getRequestBody = function (request) {
+//   let body = [];
+//   request.on('data', (chunk) => {
+//     body.push(chunk);
+//   }).on('end', () => {
+//     body = Buffer.concat(body).toString();
+//     // at this point, `body` has the entire request body stored in it as a string
+//     return body;
+//   });
+// };
+var handlePostRequest = function (request, response) {
+  let body = [];
+  // debugger;
+  request.on('data', (chunk) => {
+    body.push(chunk);
+  }).on('end', () => {
+    body = Buffer.concat(body).toString();
+    // at this point, `body` has the entire request body stored in it as a string
+    console.log(typeof body);
+    return body;
+  });
+};
+
 var handleGetRequest = function (response) {
-  console.log('inside handleGetRequest');
+  // console.log('inside handleGetRequest');
   var statusCode = 200;
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'application/json';
@@ -34,17 +57,70 @@ var handleGetRequest = function (response) {
       response.end(JSON.stringify(err));
       throw err;
     }
-    console.log(data);
+    // console.log(data);
     data = JSON.parse(data);
-    console.log(data);
+    // console.log(data);
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(data));
   });
   
 };
 
+// var handlePostRequest = function (request, response) {
+//   // initialize header components
+//   var statusCode = 200;
+//   var headers = defaultCorsHeaders;
+//   headers['Content-Type'] = 'application/json';
+//   // read file
+//   fs.readFile('./exampleData.json', (err, data) => {
+//     // if error
+//     if (err) {
+//       // set status code to 500
+//       statusCode = 500;
+//       // write head
+//       response.writeHead(statusCode, headers);
+//       // end response
+//       response.end(JSON.stringify(err));
+//       throw err;
+//     // else 
+//     } else {
+//       // retrieve exampleData object (convert from JSON)
+//       data = JSON.parse(data);
+//       // retrieve message object from request
+//       debugger;
+//       var message = JSON.parse(getRequestBody(request));
+//       // add objectId to message object
+//       message.objectId = data.results.length;
+//       // push message object into data.results array
+//       data.results.push(message);
+//       // convert data object back into JSON
+//       data = JSON.stringify(data);
+//       // write to exampleData.json
+//       fs.writeFile('./exampleData.json', data, (err) => {
+//         // if error
+//         if (err) {
+//           // set status code to 500
+//           statusCode = 500;
+//           // write head
+//           response.writeHead(statusCode, headers);
+//           // end response
+//           response.end(JSON.stringify(err));
+//           throw err;
+//         // else
+//         } else {
+//           // write head
+//           response.writeHead(statusCode, headers);
+//           // end response
+//           response.end();
+//         }
+//       });
+//     }
+//   });
+// }
+
+
 var handleOptionsRequest = function(request, response) {
-  console.log('response:', response);
+  // console.log('response:', response);
   var statusCode = 200;
   var headers = defaultCorsHeaders;
   headers['Content-Type'] = 'application/json';
@@ -59,6 +135,7 @@ var handleOptionsRequest = function(request, response) {
     response.end();
   }  
 };
+
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -109,7 +186,7 @@ var requestHandler = function(request, response) {
   } else if (request.method === 'GET') {
     handleGetRequest(response);
   } else if (request.method === 'POST') {
-    // handlePostRequest(response);
+    handlePostRequest(request, response);
   } else {
     // handleError(response);
   }
