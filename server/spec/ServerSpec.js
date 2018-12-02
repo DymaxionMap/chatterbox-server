@@ -3,44 +3,48 @@ var expect = require('chai').expect;
 var stubs = require('./Stubs');
 
 describe('Node Server Request Listener Function', function() {
-  it('Should answer GET requests for /classes/messages with a 200 status code', function() {
+  it('Should answer GET requests for /classes/messages with a 200 status code', function(done) {
     // This is a fake server request. Normally, the server would provide this,
     // but we want to test our function's behavior totally independent of the server code
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
-
+    done();
+    
     expect(res._responseCode).to.equal(200);
     expect(res._ended).to.equal(true);
   });
 
-  it('Should send back parsable stringified JSON', function() {
+  it('Should send back parsable stringified JSON', function(done) {
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
+    done();
 
     expect(JSON.parse.bind(this, res._data)).to.not.throw();
     expect(res._ended).to.equal(true);
   });
 
-  it('Should send back an object', function() {
+  it('Should send back an object', function(done) {
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
+    done();
 
     var parsedBody = JSON.parse(res._data);
     expect(parsedBody).to.be.an('object');
     expect(res._ended).to.equal(true);
   });
 
-  it('Should send an object containing a `results` array', function() {
+  it('Should send an object containing a `results` array', function(done) {
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
+    done();
 
     var parsedBody = JSON.parse(res._data);
     expect(parsedBody).to.have.property('results');
@@ -48,7 +52,7 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-  it('Should accept posts to /classes/messages', function() {
+  it('Should accept posts to /classes/messages', function(done) {
     var stubMsg = {
       username: 'Jono',
       text: 'Do my bidding!'
@@ -57,6 +61,7 @@ describe('Node Server Request Listener Function', function() {
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
+    done();
 
     // Expect 201 Created response status
     expect(res._responseCode).to.equal(201);
@@ -67,7 +72,7 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-  it('Should respond with messages that were previously posted', function() {
+  it('Should respond with messages that were previously posted', function(done) {
     var stubMsg = {
       username: 'Jono',
       text: 'Do my bidding!'
@@ -76,6 +81,7 @@ describe('Node Server Request Listener Function', function() {
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
+    done();
 
     expect(res._responseCode).to.equal(201);
 
@@ -84,6 +90,7 @@ describe('Node Server Request Listener Function', function() {
     res = new stubs.response();
 
     handler.requestHandler(req, res);
+    done();
 
     expect(res._responseCode).to.equal(200);
     var messages = JSON.parse(res._data).results;
@@ -93,11 +100,12 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-  it('Should 404 when asked for a nonexistent file', function() {
+  it('Should 404 when asked for a nonexistent file', function(done) {
     var req = new stubs.request('/arglebargle', 'GET');
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
+    done();
 
     expect(res._responseCode).to.equal(404);
     expect(res._ended).to.equal(true);

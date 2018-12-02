@@ -40,6 +40,7 @@ var handleGetRequest = function (response) {
     // console.log(data);
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(data));
+    console.log(data);
   });
   
 };
