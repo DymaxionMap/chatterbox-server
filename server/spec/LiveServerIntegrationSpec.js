@@ -72,6 +72,43 @@ describe('server', function() {
       done();
     });
   });
-
-
+  
+  it('Should 405 if unacceptable request method is passed', function(done) {
+    var requestParams = {method: 'TRACE',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+    };
+    
+    request(requestParams, function(error, response, body) {
+      expect(response.statusCode).to.equal(405);
+      done();
+    });
+  });
+  
+  it('Should respond with 200 for OPTIONS requests with correct headers', function(done) {
+    var requestParams = {method: 'OPTIONS',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      headers: {
+        'access-control-request-method': 'GET'
+      }
+    };
+    
+    request(requestParams, function(error, response, body) {
+      expect(response.statusCode).to.equal(200);
+      done();
+    });
+  });
+  
+  it('Should respond with 403 for OPTIONS request with incorrect headers', function(done) {
+    var requestParams = {method: 'OPTIONS',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      headers: {
+        'access-control-request-method': 'TRACE'
+      }
+    };
+    
+    request(requestParams, function(error, response, body) {
+      expect(response.statusCode).to.equal(403);
+      done();
+    });
+  });
 });
